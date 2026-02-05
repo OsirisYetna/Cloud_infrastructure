@@ -1,6 +1,6 @@
 """Structure Collection + Database"""
 # Imports
-from utils.lab1 import calculate_doc_size, compute_sharding_metrics, convert_bytes_to_gb, compute_collection_volume
+from utils.help_lab1 import calculate_doc_size, compute_sharding_metrics, convert_bytes_to_gb, compute_collection_volume
 
 # Config
 SIZES = {
@@ -45,6 +45,7 @@ class Collection:
         key_cardinality = self.stats.get(key_stat_name, 0)
         metrics = compute_sharding_metrics(self.count, key_cardinality)
         strategy_name = f"{self.name} - #{key_stat_name}"
+        metrics['strategy'] = strategy_name
         self.sharding_analysis[strategy_name] = metrics
         return metrics
 

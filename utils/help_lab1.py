@@ -1,9 +1,34 @@
+"""help_lab1.py"""
 """ 
 Utils fonction to implement the structure asked in the lab1 
 It is a adaptated copy of the practise work
 """
 
-# ----- Utils Functions -------
+# ----- Utils Functions ------
+def compute_collection_volume(collection_name, stats_config, rule):
+    """
+    Determines the number of documents in a collection based on stats and rules.
+    """
+    # CASE 1: Count the number of product
+    # In the lab, it is said that we have for each product there nb_warehouses documents 
+    if rule == "product_x_warehouse":
+        n_prod = stats_config.get("nb_products", 0)
+        n_warehouses = stats_config.get("nb_warehouses", 0)
+        return n_prod * n_warehouses
+
+    # CASE 2: Direct Mapping with the SIZE Config
+    elif rule == "direct":
+        # formatting the collection to tget the volume
+        stat_key = f"nb_{collection_name.lower()}s"
+        count = stats_config.get(stat_key, 0)
+        
+        # 2. Specific fix for OrderLine
+        if count == 0 and collection_name == "OrderLine":
+            return stats_config.get("nb_orderlines", 0)
+            
+        return count
+        
+    return 0
 
 def get_field_size(field_name, field_type, sizes_config, dates_list, long_strings_list):
     """
@@ -70,8 +95,7 @@ def convert_bytes_to_gb(doc_size_bytes, collection_count):
 
 def compute_sharding_metrics(collection_count, key_cardinality, nb_servers=1000):
     """
-    Computes distribution statistics for sharding strategies.
-    Returns a dictionary.
+    Computes distribution statistics for sharding strategies
     """
     # Calculate averages per server
     avg_docs = collection_count / nb_servers
@@ -84,6 +108,4 @@ def compute_sharding_metrics(collection_count, key_cardinality, nb_servers=1000)
         "key_cardinality": key_cardinality,
         "avg_docs_per_server": avg_docs,
         "avg_keys_per_server": avg_keys,
-        "risk_skew": avg_keys < 10,       # Warning if too few keys per server
-        "risk_empty": avg_keys < 1        # Critical if servers remain empty
     }
