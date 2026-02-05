@@ -3,7 +3,7 @@ Utils fonction to implement the structure asked in the lab1
 It is a adaptated copy of the practise work
 """
 
-# ----- Utils Functions -------
+# ----- Utils Functions ------
 def compute_collection_volume(collection_name, stats_config, rule):
     """
     Determines the number of documents in a collection based on stats and rules.
