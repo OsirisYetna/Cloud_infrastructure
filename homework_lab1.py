@@ -31,7 +31,7 @@ class Collection:
             long_strings_list=LONG_STRINGS 
         )
         
-        # compute the number of documents in a collections
+        # compute the number of documents in a collection
         self.count = compute_collection_volume(self.name, self.stats, count_rule)
             
         # Total size in GB
