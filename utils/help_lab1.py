@@ -1,7 +1,6 @@
-"""help_lab1.py"""
 """ 
-Utils fonction to implement the structure asked in the lab1 
-It is a adaptated copy of the practise work
+    Utils fonction to implement the structure asked in the lab1 
+    It is a adaptated copy of the practise work
 """
 
 # ----- Utils Functions ------

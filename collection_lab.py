@@ -1,4 +1,4 @@
-"""Structure Collection + Database"""
+"""Class Collection"""
 # Imports
 from utils.help_lab1 import calculate_doc_size, compute_sharding_metrics, convert_bytes_to_gb, compute_collection_volume
 
@@ -20,8 +20,8 @@ class Collection:
         self.name = name
         self.schema = schema
         self.stats = stats 
-        self.sharding_analysis = {} 
-        
+        self.sharding_analysis = {}
+
         # Calcul of bytes
         self.doc_size_bytes = calculate_doc_size(
             schema=self.schema,
@@ -49,36 +49,29 @@ class Collection:
         self.sharding_analysis[strategy_name] = metrics
         return metrics
 
-class Database:
-    """
-    Represents Databases as collections of Collections
-    """
-    def __init__(self, name):
-        self.name = name
-        self.collections = {}
+    def get_projected_doc_size(self, projected_keys):
+        """
+        Compute the size of a reducted document obtained by keeping the keys : projected_key
+        """
+        if not projected_keys or projected_keys == ["*"]:
+            return self.doc_size_bytes
         
-    def add_collection(self, collection_obj):
-        """
-        Adds a Collection object to the database.
-        """
-        self.collections[collection_obj.name] = collection_obj
-        
-    def get_total_size_gb(self):
-        """
-        Calculates the sum of all collection sizes in GB.
-        """
-        return sum(c.total_size_gb for c in self.collections.values())
+        # Building a temporary schema with asked keys
+        mini_schema = {"type": "object", "properties": {}}
 
-    def print_report(self):
-        """
-        Generates and prints the formatted size report for the database.
-        Matches the format requested in the exercise.
-        """
-        print(f"--- REPORT FOR {self.name} ---")
-        
-        # Iterate over all collections to print details
-        for name, col in self.collections.items():
-            print(f"Collection: {name:<12} | Doc Size: {col.doc_size_bytes:>8,.0f} B | Count: {col.count:>12,.0f} | Total: {col.total_size_gb:>8.2f} GB")
-            
-        # Print total database size
-        print(f">>>> TOTAL SIZE: {self.get_total_size_gb():.2f} GB\n")
+        original_props = self.schema.get("properties", {})
+        for key in projected_keys:
+            if key in original_props:
+                # Copyig the properties we are looking for in the mini_schema
+                mini_schema["properties"][key] = original_props[key]
+
+        # Computing the size of the mini shema
+        return calculate_doc_size(
+            mini_schema, 
+            SIZES,
+            self.stats,
+            DATES, 
+            LONG_STRINGS
+
+        )
+    
